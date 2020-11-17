@@ -16,8 +16,8 @@ parsed_requirements = parse_requirements("requirements.txt", session="workaround
 parsed_dev_requirements = parse_requirements("requirements_dev.txt", session="workaround")
 
 
-requirements = [str(ir.req) for ir in parsed_requirements]
-requirements_dev = [str(tr.req) for tr in parsed_dev_requirements]
+requirements = [str(getattr(ir, "req", getattr(ir, "requirement", None))) for ir in parsed_requirements]
+requirements_dev = [str(getattr(dr, "req", getattr(dr, "requirement", None))) for dr in parsed_dev_requirements]
 
 setup(
     author="Namespace OÜ",
