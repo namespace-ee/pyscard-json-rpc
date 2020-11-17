@@ -6,6 +6,10 @@ To use pyscard JSON RPC in a project::
 
     import pyscard_json_rpc
 
+Listening URL::
+
+    ws://localhost:8040/ws/pyscard-json-rpc
+
 API calls::
 
     {"jsonrpc": "2.0", "method": "smartcard.get_readers"}
