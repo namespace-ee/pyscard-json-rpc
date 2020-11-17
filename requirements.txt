@@ -1,0 +1,4 @@
+fastapi
+pyscard
+uvicorn
+websockets
