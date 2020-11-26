@@ -26,7 +26,7 @@ def get_message_type(message: Dict) -> str:
     raise ValueError("Message does not conform to JSON-RPC 2.0 standard")
 
 
-def format_request(method: str, request_id: Optional[str], params: Optional[Dict] = None) -> Dict:
+def format_request(method: str, request_id: Optional[str] = None, params: Optional[Dict] = None) -> Dict:
     data = {
         "jsonrpc": "2.0",
         "method": method,

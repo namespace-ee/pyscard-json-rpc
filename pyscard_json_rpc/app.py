@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from collections import defaultdict
 from typing import Dict
@@ -5,12 +6,15 @@ from uuid import UUID
 
 from fastapi import FastAPI
 from smartcard.CardConnection import CardConnection
+from smartcard.CardMonitoring import CardMonitor
 from smartcard.Exceptions import SmartcardException
+from smartcard.ReaderMonitoring import ReaderMonitor
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from pyscard_json_rpc import connections
 from pyscard_json_rpc.json_rpc import format_error, get_message_type, format_response
 from pyscard_json_rpc.methods import METHOD_HANDLERS
+from pyscard_json_rpc.observers import PrintReaderObserver, PrintCardObserver
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +30,6 @@ def logging_setup():
 
 
 app = FastAPI(on_startup=[environment_setup, logging_setup], on_shutdown=[])
-
 
 ### tachocard app -> smartcard service
 # smartcard.get_readers
@@ -47,8 +50,17 @@ app = FastAPI(on_startup=[environment_setup, logging_setup], on_shutdown=[])
 async def websocket_handler(websocket: WebSocket):
 
     await websocket.accept()
+    # define monitors/observers
+    loop = asyncio.get_event_loop()
+    readermonitor = ReaderMonitor()
+    readerobserver = PrintReaderObserver(websocket=websocket, loop=loop)
+    cardmonitor = CardMonitor()
+    cardobserver = PrintCardObserver(websocket=websocket, loop=loop)
 
     try:
+        # add observers
+        readermonitor.addObserver(readerobserver)
+        cardmonitor.addObserver(cardobserver)
         while True:
             message = await websocket.receive_json()
             message_type = get_message_type(message)
@@ -84,3 +96,7 @@ async def websocket_handler(websocket: WebSocket):
         for connection_id, connection in connections.card_connections[websocket.scope["client"]].items():
             logger.error(f"connection {connection_id} was left open")
             connection.disconnect()
+
+        # remove observers
+        readermonitor.deleteObserver(readerobserver)
+        cardmonitor.deleteObserver(cardobserver)
