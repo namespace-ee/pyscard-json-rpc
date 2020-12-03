@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 """The setup script."""
-from pip._internal.req import parse_requirements
 from setuptools import setup, find_packages
 
 with open("README.rst") as readme_file:
@@ -11,13 +10,19 @@ with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
 
-parsed_requirements = parse_requirements("requirements.txt", session="workaround")
+def get_requirements(filename):
+    """
+    parse requirements.txt, ignore links, exclude comments
+    """
+    requirements = []
+    for line in open(filename).readlines():
+        # skip to next iteration if comment or empty line
+        if line.startswith("#") or line == "" or line.startswith("http") or line.startswith("git"):
+            continue
+        # add line to requirements
+        requirements.append(line)
+    return requirements
 
-parsed_dev_requirements = parse_requirements("requirements_dev.txt", session="workaround")
-
-
-requirements = [str(getattr(ir, "req", getattr(ir, "requirement", None))) for ir in parsed_requirements]
-requirements_dev = [str(getattr(dr, "req", getattr(dr, "requirement", None))) for dr in parsed_dev_requirements]
 
 setup(
     author="Namespace OÜ",
@@ -39,7 +44,7 @@ setup(
             "pyscard_json_rpc=pyscard_json_rpc.cli:main",
         ],
     },
-    install_requires=requirements,
+    install_requires=get_requirements("requirements.txt"),
     license="MIT license",
     long_description=readme + "\n\n" + history,
     include_package_data=True,
@@ -47,7 +52,7 @@ setup(
     name="pyscard-json-rpc",
     packages=find_packages(include=["pyscard_json_rpc", "pyscard_json_rpc.*"]),
     test_suite="tests",
-    tests_require=requirements_dev,
+    tests_require=get_requirements("requirements_dev.txt"),
     url="https://github.com/namespace-ee/pyscard-json-rpc",
     version="0.1.0",
     zip_safe=False,
