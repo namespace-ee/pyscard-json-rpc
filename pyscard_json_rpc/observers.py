@@ -13,7 +13,7 @@ from pyscard_json_rpc.json_rpc import format_request
 PROTOCOLS_MAPPING = {
     "T=0": 0x00000001,  # T0_protocol
     "T=1": 0x00000002,  # T1_protocol
-    "T=15": 0x00000008  # T15_protocol
+    "T=15": 0x00000008,  # T15_protocol
 }
 
 
@@ -22,6 +22,7 @@ class PrintReaderObserver(ReaderObserver):
     when readers are added/removed from the system and
     prints the list of readers
     """
+
     websocket = None
     loop = None
 
@@ -54,6 +55,7 @@ class PrintCardObserver(CardObserver):
     when cards are inserted/removed from the system and
     prints the list of cards
     """
+
     websocket = None
     loop = None
 
@@ -76,8 +78,8 @@ class PrintCardObserver(CardObserver):
                         PROTOCOLS_MAPPING[k]
                         for k, v in atr.getSupportedProtocols().items()
                         if k in PROTOCOLS_MAPPING and v is True
-                    ]
-                }
+                    ],
+                },
             )
             asyncio.run_coroutine_threadsafe(self.websocket.send_json(response), self.loop)
 
@@ -85,10 +87,6 @@ class PrintCardObserver(CardObserver):
             response = format_request(
                 method="observer.card_removed",
                 request_id=str(uuid.uuid4()),
-                params={
-                    "reader": str(card.reader),
-                    "atr": toHexString(card.atr, PACK)
-                }
+                params={"reader": str(card.reader), "atr": toHexString(card.atr, PACK)},
             )
             asyncio.run_coroutine_threadsafe(self.websocket.send_json(response), self.loop)
-
