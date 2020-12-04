@@ -1,11 +1,10 @@
-import binascii
-import struct
 import uuid
 from uuid import UUID
 
 import smartcard.System
 from smartcard.CardConnection import CardConnection
 from smartcard.reader.Reader import Reader
+from smartcard.util import toBytes, toHexString, PACK
 
 from pyscard_json_rpc import connections
 
@@ -40,7 +39,7 @@ def connection_get_atr(websocket, **params):
     atr = connection.getATR()
 
     return {
-        "atr": binascii.hexlify(bytes(atr)).decode("utf-8"),
+        "atr": toHexString(atr, PACK),
     }
 
 
@@ -48,16 +47,15 @@ def connection_transmit(websocket, **params):
     connection_id = UUID(params["connection_id"])
     connection: CardConnection = connections.card_connections[websocket.scope["client"]][connection_id]
 
-    apdu_request = binascii.unhexlify(params["apdu"])
     data, sw1, sw2 = connection.transmit(
-        bytes=[int(x) for x in apdu_request or []],
+        bytes=toBytes(params["apdu"]),
         protocol=params.get("protocol"),
     )
 
     return {
-        "data": binascii.hexlify(bytes(data)).decode("utf-8"),
-        "sw1": binascii.hexlify(struct.pack("<B", sw1)).decode("utf-8"),
-        "sw2": binascii.hexlify(struct.pack("<B", sw2)).decode("utf-8"),
+        "data": toHexString(data, PACK),
+        "sw1": toHexString([sw1], PACK),
+        "sw2": toHexString([sw2], PACK),
     }
 
 
