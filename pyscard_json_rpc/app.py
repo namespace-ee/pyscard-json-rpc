@@ -70,12 +70,12 @@ async def websocket_handler(websocket: WebSocket):
                     try:
                         result = METHOD_HANDLERS[message["method"]](websocket=websocket, **message.get("params", {}))
                         response = format_response(result=result, request_id=message.get("id"))
-                    except (KeyError, StopIteration) as exc:
+                    except (KeyError, ValueError, TypeError, StopIteration) as exc:
                         logger.exception(f"caught exception during handling {message['method']}", exc_info=exc)
-                        response = format_error(code=-32602, request_id=message.get("id"))
+                        response = format_error(code=-32602, message=str(exc.args[0]), request_id=message.get("id"))
                     except SmartcardException as exc:
                         logger.exception(f"caught exception during handling {message['method']}", exc_info=exc)
-                        response = format_error(code=-32000, message=exc.args[0], request_id=message.get("id"))
+                        response = format_error(code=-32000, message=str(exc.args[0]), request_id=message.get("id"))
                 else:
                     response = format_error(code=-32601, request_id=message.get("id"))
 
