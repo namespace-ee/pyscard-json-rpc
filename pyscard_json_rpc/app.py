@@ -95,6 +95,9 @@ async def websocket_handler(websocket: WebSocket):
             logger.error(f"connection {connection_id} was left open")
             connection.disconnect()
 
-        # remove observers
-        readermonitor.deleteObserver(readerobserver)
-        cardmonitor.deleteObserver(cardobserver)
+        try:
+            # This can fail if the observer was not added to the monitor.
+            readermonitor.deleteObserver(readerobserver)
+        finally:
+            # note: remove card observer even if reader observer delete fails!
+            cardmonitor.deleteObserver(cardobserver)
