@@ -68,9 +68,7 @@ async def websocket_handler(websocket: WebSocket):
             if message_type == "request":
                 if message["method"] in METHOD_HANDLERS:
                     try:
-                        result = await METHOD_HANDLERS[message["method"]](
-                            websocket=websocket, **message.get("params", {})
-                        )
+                        result = METHOD_HANDLERS[message["method"]](websocket=websocket, **message.get("params", {}))
                         response = format_response(result=result, request_id=message.get("id"))
                     except (KeyError, StopIteration) as exc:
                         logger.exception(f"caught exception during handling {message['method']}", exc_info=exc)

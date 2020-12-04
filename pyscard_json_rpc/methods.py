@@ -10,11 +10,11 @@ from smartcard.reader.Reader import Reader
 from pyscard_json_rpc import connections
 
 
-async def smartcard_get_readers(websocket, **params):
+def smartcard_get_readers(websocket, **params):
     return {"readers": [reader.name for reader in smartcard.System.readers()]}
 
 
-async def smartcard_connect(websocket, **params):
+def smartcard_connect(websocket, **params):
     readers = smartcard.System.readers()
     reader: Reader = next(reader for reader in readers if reader.name == params.get("reader"))
 
@@ -33,7 +33,7 @@ async def smartcard_connect(websocket, **params):
     }
 
 
-async def connection_get_atr(websocket, **params):
+def connection_get_atr(websocket, **params):
     connection_id = UUID(params["connection_id"])
     connection: CardConnection = connections.card_connections[websocket.scope["client"]][connection_id]
 
@@ -44,7 +44,7 @@ async def connection_get_atr(websocket, **params):
     }
 
 
-async def connection_transmit(websocket, **params):
+def connection_transmit(websocket, **params):
     connection_id = UUID(params["connection_id"])
     connection: CardConnection = connections.card_connections[websocket.scope["client"]][connection_id]
 
@@ -61,7 +61,7 @@ async def connection_transmit(websocket, **params):
     }
 
 
-async def connection_disconnect(websocket, **params):
+def connection_disconnect(websocket, **params):
     connection_id = UUID(params["connection_id"])
     connection: CardConnection = connections.card_connections[websocket.scope["client"]][connection_id]
     connection.disconnect()
