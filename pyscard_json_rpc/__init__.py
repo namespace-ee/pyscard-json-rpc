@@ -2,4 +2,4 @@
 
 __author__ = """Namespace OÜ"""
 __email__ = "info@namespace.ee"
-__version__ = "0.2.0"
+__version__ = "0.2.1"

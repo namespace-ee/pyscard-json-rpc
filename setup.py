@@ -54,6 +54,6 @@ setup(
     test_suite="tests",
     tests_require=get_requirements("requirements_dev.txt"),
     url="https://github.com/namespace-ee/pyscard-json-rpc",
-    version="0.2.0",
+    version="0.2.1",
     zip_safe=False,
 )
