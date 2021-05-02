@@ -1,4 +1,4 @@
 fastapi
 pyscard
 uvicorn
-websockets
+websockets==9.0.1
