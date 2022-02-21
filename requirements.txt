@@ -1,4 +1,4 @@
-fastapi
+fastapi==0.74.1
 pyscard
 uvicorn
 websockets
