@@ -1,4 +1,4 @@
 fastapi
-pyscard
+pyscard==2.0.3
 uvicorn
 websockets
